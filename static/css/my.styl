@@ -1,0 +1,121 @@
+body
+  padding 1rem
+
+samp
+  background-color: #fafafa
+  padding: .1rem 0.5rem
+  font-family: monospace
+  border: 1px solid lightgrey
+  font-size: 10pt
+  width: 100%
+  display: inline-block
+
+.btn.disabled
+.btn:disabled
+  opacity: .2
+
+#toggleSelection
+  .btn-link
+    margin 0 .1rem
+    &:hover
+    &:focus
+      text-decoration none !important
+
+.container
+  max-width unset
+
+
+.custom-file-input:lang(ru)~.custom-file-label::after
+  content: "выбрать"
+
+#table_container
+  max-height 20rem
+  overflow-y auto
+  border 1px solid lightgray
+  margin-bottom 1rem
+
+#rows_table
+  font-size: 10pt
+  border-bottom 1px solid #f2f2f2
+
+  td
+    line-height: 1.2
+    vertical-align: middle
+    padding-bottom .15rem
+
+.success
+.error
+.info
+.normal
+  font-weight bold
+
+.success
+  color #00a100
+
+.error
+  color red
+
+.info
+  color #17a2b8
+
+.normal
+  color black
+
+  .result_cell
+    border-left 1px solid lightgrey
+
+.unchecked
+  td
+    color #bcbcbc
+
+.wide-checkbox
+  padding-left 2rem
+  margin-right 0
+  width 100%
+  cursor pointer
+
+.loading-overlay .loading-background
+  opacity .75
+
+.clearable
+  input
+    padding-right 2rem !important
+  span
+    display none
+
+  &.filled
+    span
+      display inline
+      position: relative
+      left: -1.8rem
+      font-family: monospace
+      font-size: 1.4rem
+      cursor: pointer
+      border-left: 1px solid lightgray
+      padding-left: .5rem
+      color darkgray
+
+.loading:after
+  font-size: 1.4rem
+  content: ' .'
+  animation: dots 1s steps(5, end) infinite
+
+@keyframes dots {
+  0%, 20% {
+    color: rgba(0,0,0,0);
+    text-shadow:
+      .25em 0 0 rgba(0,0,0,0),
+      .5em 0 0 rgba(0,0,0,0);}
+  40% {
+    color: black;
+    text-shadow:
+      .25em 0 0 rgba(0,0,0,0),
+      .5em 0 0 rgba(0,0,0,0);}
+  60% {
+    text-shadow:
+      .25em 0 0 black,
+      .5em 0 0 rgba(0,0,0,0);}
+  80%, 100% {
+    text-shadow:
+      .25em 0 0 black,
+      .5em 0 0 black;}}

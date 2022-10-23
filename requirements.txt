@@ -1,0 +1,6 @@
+werkzeug
+flask
+requests
+gunicorn
+json-rpc
+werkzeug

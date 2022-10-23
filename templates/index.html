@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <title>ТелеТайм - разнос реестров из Банка</title>
+  {% include "_favicon.html" %}
+  <meta name="viewport" content="shrink-to-fit=no, initial-scale=1, width=device-width">
+  {% include "_styles.html" %}
+</head>
+
+<body>
+<div id="app" class="container">
+  <b-container fluid>
+    <b-row align-h="start">
+      <b-col cols="8" sm="10" lg="11">
+        <b-file
+            id="input_file"
+            v-model="file"
+            :state="Boolean(file)"
+            placeholder="файл реестра..."
+            accept="text/plain"
+            lang="ru"
+            ref="inputFile"
+            required
+            @change="fileInputChanged"
+            :disabled="currentTask.active"
+        ></b-file>
+      </b-col>
+      <b-col cols="4" sm="2" lg="1">
+        <b-button variant="warning" v-b-modal="'modalHelp'">помощь</b-button>
+      </b-col>
+    </b-row>
+
+    <div v-if="reg.records.length">
+      <b-row align-v="center">
+        <b-col>
+           <div style="margin: .4rem 0">
+            <b-button-group size="sm" id="toggleSelection">
+              <b-button variant="link" :disabled="checkedAll || currentTask.active" @click="checkedAll=true"
+              title="все" >▣</b-button>
+              <b-button variant="link" :disabled="checkedNone || currentTask.active" @click="checkedAll=false"
+              title="ничего">▢</b-button>
+              <b-button variant="link" @click="invertSelection" :disabled="currentTask.active"
+              title="инвертировать">◩</b-button>
+            </b-button-group>
+            <span>выбрано записей: ${checkedTotal.amount}</span>
+              <span v-if="checkedTotal.amount > 0">
+                на сумму: ${checkedTotal.transferred}
+              </span>
+          </div>
+        </b-col>
+        <b-col>
+          <samp>${total_row.replace(/;/g, '; ')}</samp>
+        </b-col>
+      </b-row>
+
+      <div id="table_container">
+        <b-table
+          id="rows_table"
+          ref="table"
+          hover
+          small
+          :items="reg.records"
+          :fields="table_params.fields"
+        >
+          <template slot="checked" slot-scope="data">
+            <b-checkbox
+                class="wide-checkbox"
+                v-model="data.item.checked"
+                :disabled="currentTask.active"
+                @click.native="() => {checkboxClick(data.item)}"
+                @input="(new_val) => {checkboxChanged(data.index, new_val)}"
+            >
+            </b-checkbox>
+          </template>
+          <template slot="billing" slot-scope="data">
+            <span :class="data.item.billing.class">${data.item.billing.msg}</span>
+          </template>
+          <template slot="fiscal" slot-scope="data">
+            <span :class="data.item.fiscal.class">
+              ${data.item.fiscal.msg}
+            </span>
+          </template>
+        </b-table>
+      </div>
+      <b-form v-if="!currentTask.active" inline class="pl-3">
+        <label class="mb-2 mr-3 pt-1" for="serviceName">услуга</label>
+        <b-select
+            class="mr-4"
+            id="serviceName"
+            v-model="reg.service"
+            :options="service_options"
+        >
+{#              <option slot="first" :value="null">Choose...</option>#}
+        </b-select>
+
+        <label class="mb-2 mr-3 pt-1" for="officeCity">офис</label>
+        <b-select
+            class="mr-4"
+            id="officeCity"
+            v-model="reg.city"
+            :options="city_options"
+        >
+{#              <option slot="first" :value="null">Choose...</option>#}
+        </b-select>
+        <b-button
+          v-b-modal="'confirmPays'"
+          variant="success"
+          class="mt-3 mt-sm-0 mr-3"
+          variant="primary"
+          :disabled="checkedNone || !reg.service || !reg.city || reg.service == 'ctv'"
+        >
+          разнести платежи
+        </b-button>
+        <b-button
+          v-b-modal="'confirmFiscals'"
+          class="mt-3 mt-sm-0 mr-3"
+          variant="primary"
+          :disabled="checkedNone || !reg.service"
+        >
+          сформировать чеки
+        </b-button>
+      </b-form>
+      <b-row v-else align-v="center" align-h="end">
+      <b-col style="max-width: 60rem">
+        <b-row v-if="currentTask.active">
+          <b-col cols="12" sm="10">
+            <span class="loading">
+              ${currentTask.caption} (${currentTask.pbVal}/${currentTask.pbMax})
+            </span>
+            <b-progress
+              animated
+              height="0.5rem"
+              :max="currentTask.pbMax"
+              :value="currentTask.pbVal"
+              :variant="currentTask.variant">
+            </b-progress>
+          </b-col>
+          <b-col cols="12" sm="2" v-if="currentTask.cancelable">
+            <b-row align-h="center">
+              <b-button
+                  :disabled="currentTask.cancelled"
+                  style="width: 90%"
+                  variant="danger"
+                  @click="{currentTask.cancelled = true}"
+              >отмена</b-button>
+            </b-row>
+          </b-col>
+        </b-row>
+      </b-col>
+    </b-row>
+
+    </div>
+  </b-container>
+
+  {% include "_modal-pays.html" %}
+  {% include "_modal-fiscals.html" %}
+  {% include "_modal-help.html" %}
+
+</div>
+
+  {% include "_scripts.html" %}
+</body>
+
+</html>

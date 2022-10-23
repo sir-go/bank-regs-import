@@ -1,0 +1,34 @@
+  <b-modal
+      no-close-on-backdrop
+      cancel-title="Отмена"
+      ok-title="Всё верно"
+      cancel-variant="link"
+      centered
+
+      id="confirmPays"
+      title="Разнос платежей"
+      @ok="{startReqChain('make_payment')}"
+      ok-variant="success"
+  >
+    <b-row align-v="center">
+      <b-col cols="4">биллинг:</b-col>
+      <b-col>Интернет, ${cityName}</b-col>
+    </b-row>
+    <b-row align-v="center">
+      <b-col cols="4">число платежей:</b-col>
+      <b-col>${checkedTotal.amount}</b-col>
+    </b-row>
+    <b-row align-v="center">
+      <b-col cols="4">на сумму:</b-col>
+      <b-col>${checkedTotal.transferred}</b-col>
+    </b-row>
+    <b-row align-v="center">
+      <b-col cols="4">комментарий:</b-col>
+      <b-col>
+        <b-button-group :class="[{filled: !!reg.comment}, 'clearable']">
+          <b-input size="sm" v-model="reg.comment" maxlength="255" ref="commentInput"></b-input>
+          <span @click="{reg.comment = null; $refs.commentInput.$el.focus()}">x</span>
+        </b-button-group>
+      </b-col>
+    </b-row>
+  </b-modal>

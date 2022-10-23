@@ -1,0 +1,31 @@
+#modalHelp .container-fluid {
+  overflow: auto;
+}
+#modalHelp .container-fluid img {
+  box-shadow: 0 1px 3px 0 #d4d4d4;
+  display: block;
+  margin: 0.5rem 0;
+}
+#modalHelp .container-fluid img.inline {
+  display: inline-block;
+}
+#modalHelp .container-fluid p {
+  margin-bottom: 0.5rem;
+}
+#modalHelp .container-fluid ul {
+  list-style-type: none;
+  padding-left: 1rem;
+}
+#modalHelp .t-key {
+  font-family: monospace;
+  font-size: 10pt;
+}
+#modalHelp .results {
+  padding: 0 1rem;
+}
+#modalHelp .results .row {
+  border-top: 1px solid #eee;
+}
+#modalHelp .results .t-head {
+  background-color: #eee;
+}

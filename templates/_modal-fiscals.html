@@ -1,0 +1,37 @@
+  <b-modal
+      no-close-on-backdrop
+      cancel-title="Отмена"
+      ok-title="Всё верно"
+      cancel-variant="link"
+      centered
+
+      id="confirmFiscals"
+      title="Формирование чеков"
+      @ok="{startReqChain('make_fiscal')}"
+  >
+    <b-container>
+      <b-row align-v="center">
+        <b-col cols="4">услуга:</b-col>
+        <b-col>абонентская плата за ${SERVICES_DICT[reg.service]}</b-col>
+      </b-row>
+      <b-row align-v="center">
+        <b-col cols="4">число платежей:</b-col>
+        <b-col>${checkedTotal.amount}</b-col>
+      </b-row>
+      <b-row align-v="center">
+        <b-col cols="4">на сумму:</b-col>
+        <b-col>${checkedTotal.transferred}</b-col>
+      </b-row>
+      <b-row align-v="center">
+        <b-col cols="4">место платежа:</b-col>
+        <b-col>
+         <b-select
+            id="paymentPlace"
+            v-model="reg.place"
+            :options="place_options"
+          >
+          </b-select>
+        </b-col>
+      </b-row>
+    </b-container>
+  </b-modal>
