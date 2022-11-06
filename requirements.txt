@@ -1,6 +1,4 @@
-werkzeug
-flask
-requests
-gunicorn
-json-rpc
-werkzeug
+Flask~=2.2.2
+json-rpc~=1.13.0
+Werkzeug~=2.2.2
+requests~=2.28.1

@@ -1,5 +1,3 @@
-# coding=utf8
-
 cfg = {
     'billing': {
         'api_url': "${BILLING_API_URL}",

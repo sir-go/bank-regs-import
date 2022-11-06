@@ -62,7 +62,8 @@ class BillingService:
                 'Content-Type': 'application/json;charset=utf-8',
                 'Authorization': 'Bearer {}'.format(self.__token)
             },
-            json={'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}
+            json={'jsonrpc': '2.0', 'id': 1,
+                  'method': method, 'params': params}
         )
 
         r.raise_for_status()
@@ -91,8 +92,16 @@ class BillingService:
 
         return int(account_id)
 
-    def pay(self, billing: str, pay_ext_id: str, pay_timestamp: int, paysum: float,
-            account_id: int, pay_method: int, comment: str, username: str, password: str):
+    def pay(self,
+            billing: str,
+            pay_ext_id: str,
+            pay_timestamp: int,
+            paysum: float,
+            account_id: int,
+            pay_method: int,
+            comment: str,
+            username: str,
+            password: str):
         rpc_result = self.__call(
             method='add_payment',
             params={

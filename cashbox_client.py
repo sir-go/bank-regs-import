@@ -5,7 +5,13 @@ class CashboxError(Exception):
     pass
 
 
-def make_fd(api_url: str, token: str, order_id: str, payments_place: str, paysum: float, position_name: str) -> int:
+def make_fd(
+        api_url: str,
+        token: str,
+        order_id: str,
+        payments_place: str,
+        paysum: float,
+        position_name: str) -> int:
     print(order_id, payments_place, paysum, position_name)
     r = requests.post(
         url=api_url,
