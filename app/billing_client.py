@@ -1,4 +1,3 @@
-# coding=utf8
 import requests
 
 
@@ -45,9 +44,9 @@ def check_rpc_result(rpc_result: dict):
 
     if error is not None:
         if 'code' not in error:
-            raise BillingError()
+            raise BillingError
 
-        raise BillingErrorCodes.get(error['code'], BillingError)()
+        raise BillingErrorCodes.get(error['code'], BillingError)
 
 
 class BillingService:
@@ -62,7 +61,8 @@ class BillingService:
                 'Content-Type': 'application/json;charset=utf-8',
                 'Authorization': 'Bearer {}'.format(self.__token)
             },
-            json={'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}
+            json={'jsonrpc': '2.0', 'id': 1,
+                  'method': method, 'params': params}
         )
 
         r.raise_for_status()
@@ -72,7 +72,7 @@ class BillingService:
         try:
             int(account_ext_id)
         except ValueError:
-            raise AccountNotFound()
+            raise AccountNotFound
 
         rpc_result = self.__call(
             method='get_account_info_ext',
@@ -84,15 +84,25 @@ class BillingService:
 
         check_rpc_result(rpc_result)
         rpc_acc_info = rpc_result.get('result')
+        if rpc_acc_info is None:
+            raise BillingError
 
         account_id = rpc_acc_info.get('account_id')
         if account_id is None:
-            raise AccountNotFound()
+            raise AccountNotFound
 
         return int(account_id)
 
-    def pay(self, billing: str, pay_ext_id: str, pay_timestamp: int, paysum: float,
-            account_id: int, pay_method: int, comment: str, username: str, password: str):
+    def pay(self,
+            billing: str,
+            pay_ext_id: str,
+            pay_timestamp: int,
+            paysum: float,
+            account_id: int,
+            pay_method: int,
+            comment: str,
+            username: str,
+            password: str):
         rpc_result = self.__call(
             method='add_payment',
             params={
