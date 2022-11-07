@@ -1,6 +1,6 @@
 cfg = {
     'billing': {
-        'api_url': "billing-url",
+        'api_url': "https://billing-url",
         'token': "billing-secret-token",
         'paymethod_code': 2,
         'comment': 'по реестрам из банка',
@@ -8,7 +8,7 @@ cfg = {
         'password': "billing-password"
     },
     'cashbox': {
-        'api_url': "cashbox-url",
+        'api_url': "https://cashbox-url",
         'token': "cashbox-secret-token",
         'default_place': 'касса ТелеТайм',
     },

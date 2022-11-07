@@ -1,5 +1,4 @@
 import logging
-import os
 from functools import wraps
 import traceback
 
@@ -8,9 +7,9 @@ from flask.logging import default_handler
 from jsonrpc.exceptions import JSONRPCDispatchException
 from werkzeug.middleware.proxy_fix import ProxyFix
 from jsonrpc.backend.flask import api
-import exceptions as ex
-from cashbox_client import make_fd
-from billing_client import BillingService
+from app.exceptions import ApiError, ParamFormatError
+from app.cashbox_client import make_fd
+from app.billing_client import BillingService
 
 
 def create_app(conf: dict) -> Flask:
@@ -20,32 +19,28 @@ def create_app(conf: dict) -> Flask:
         def wrapped(*args, **kwargs):
             try:
                 return f(*args, **kwargs)
-            except ex.ParamFormatError as e:
+            except ParamFormatError as e:
                 raise JSONRPCDispatchException(-32051, e.args[0])
-            except ex.ApiError:
+            except ApiError:
                 raise JSONRPCDispatchException(-32050, 'other api error')
         return wrapped
 
     _app = Flask(__name__, instance_relative_config=True)
-    _app.config.update(conf)
+    _app.config.update(conf['app'])
     _app.wsgi_app = ProxyFix(_app.wsgi_app)
     _app.url_map.strict_slashes = False
 
-    try:
-        os.makedirs(_app.instance_path)
-    except OSError:
-        pass
+    if not _app.testing:
+        _app.logger = logging.getLogger('regs-ttnet')
+        _app.logger.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+            '%(asctime)s [%(levelname)s\t] : %(message)s')
 
-    _app.logger = logging.getLogger('regs-ttnet')
-    _app.logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        '%(asctime)s [%(levelname)s\t] : %(message)s')
-
-    _app.logger.removeHandler(default_handler)
-    # log to console
-    ch = logging.StreamHandler()
-    ch.setFormatter(formatter)
-    _app.logger.addHandler(ch)
+        _app.logger.removeHandler(default_handler)
+        # log to console
+        ch = logging.StreamHandler()
+        ch.setFormatter(formatter)
+        _app.logger.addHandler(ch)
 
     _app.add_url_rule('/api', 'api', api.as_view(), methods=['POST'])
 
@@ -55,10 +50,10 @@ def create_app(conf: dict) -> Flask:
                      paysum: float, account_id: str,
                      comment: str = None, *args, **kwargs):
         if city_code not in ('tih', 'kor', 'test'):
-            raise ex.ParamFormatError(f'unknown city_code: {city_code}')
+            raise ParamFormatError(f'unknown city_code: {city_code}')
 
-        bsrv = BillingService(api_url=cfg['billing']['api_url'],
-                              token=cfg['billing']['token'])
+        bsrv = BillingService(api_url=conf['billing']['api_url'],
+                              token=conf['billing']['token'])
 
         # noinspection PyBroadException
         try:
@@ -75,10 +70,10 @@ def create_app(conf: dict) -> Flask:
                 pay_timestamp=pay_timestamp,
                 paysum=paysum,
                 account_id=account_id,
-                pay_method=cfg['billing']['paymethod_code'],
-                comment=comment or cfg['billing']['comment'],
-                username=cfg['billing']['username'],
-                password=cfg['billing']['password']
+                pay_method=conf['billing']['paymethod_code'],
+                comment=comment or conf['billing']['comment'],
+                username=conf['billing']['username'],
+                password=conf['billing']['password']
             )
         except Exception as e:
             _app.logger.error(str(request.json))
@@ -91,11 +86,10 @@ def create_app(conf: dict) -> Flask:
     def make_fiscal(service_code: str, order_id: str, paysum: float,
                     place: str = None, *args, **kwargs):
         if service_code not in ('ctv', 'internet'):
-            raise ex.ParamFormatError(
-                'unknown service_code: {}'.format(service_code))
+            raise ParamFormatError(f'unknown service_code: {service_code}')
 
         if place is None:
-            place = cfg['cashbox']['default_place']
+            place = conf['cashbox']['default_place']
 
         # noinspection PyBroadException
         try:
@@ -109,8 +103,8 @@ def create_app(conf: dict) -> Flask:
 
             _app.logger.debug(str(pay_params))
             return make_fd(
-                api_url=cfg['cashbox']['api_url'],
-                token=cfg['cashbox']['token'],
+                api_url=conf['cashbox']['api_url'],
+                token=conf['cashbox']['token'],
                 **pay_params
             )
         except Exception as e:
@@ -125,13 +119,6 @@ def create_app(conf: dict) -> Flask:
     return _app
 
 
-if __name__ == '__main__':
-    import sys
-    from conf import cfg
-
-    if len(sys.argv) > 1:
-        port = int(sys.argv[1])
-    else:
-        port = 8228
-
-    create_app(cfg).run('0.0.0.0', port)
+def prod():
+    from app.conf import cfg
+    return create_app(cfg)
